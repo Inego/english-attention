@@ -1,12 +1,13 @@
+import pickle
 import re
 from collections import Counter
 
 
-class Stat:
+class Stat(object):
     def __init__(self):
         self.d = {}
 
-    def add(self, two_letters, letter):
+    def add(self, letter, two_letters):
         counter = self.d.get(two_letters, None)
 
         if counter is None:
@@ -16,7 +17,7 @@ class Stat:
         counter[letter] += 1
 
 
-class Profile:
+class Profile(object):
     def __init__(self):
 
         self.pattern = re.compile('[A-Za-z]+')
@@ -32,18 +33,44 @@ class Profile:
         for word in words:
             self.update(word)
 
-    def update(self, word):
-        l = len(word)
+    def update(self, w):
+        l = len(w)
         if l > 3:
-            word = word.lower()
+            w = w.lower()
             for i in range(l):
-                c = word[i]
+                c = w[i]
                 if i == 0:
-                    pass
+                    self.first.add(c, (w[1], w[2]))
+                elif i == 1:
+                    self.second.add(c, (w[0], w[2]))
+                elif i == l - 2:
+                    self.prelast.add(c, (w[l-3], w[l-1]))
+                elif i == l - 1:
+                    self.last.add(c, (w[l-3], w[l-2]))
+                else:
+                    self.middle.add(c, (w[i-1], w[i+1]))
 
 
-with open('data/list907.tsv') as f:
-    lines = f.readlines()
+def gather_from_907():
 
-    for l in lines:
-        pass
+    print("Gathering profile from list 907...")
+
+    p = Profile()
+
+    with open('data/list907.tsv') as f:
+        print("Reading lines...")
+        lines = f.readlines()
+
+        print("Iterating lines...")
+        for i, l in enumerate(lines):
+            if i % 10000 == 0:
+                print(i)
+
+            p.update_by_sentence(l)
+
+    with open('data/profile.p', 'wb') as f:
+        pickle.dump(p, f)
+
+
+# =================================
+gather_from_907()
