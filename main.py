@@ -1,3 +1,4 @@
+import io
 import pickle
 import re
 from collections import Counter
@@ -57,7 +58,7 @@ def gather_from_907():
 
     p = Profile()
 
-    with open('data/list907.tsv') as f:
+    with open('data/list907.tsv', encoding='utf-8') as f:
         print("Reading lines...")
         lines = f.readlines()
 
