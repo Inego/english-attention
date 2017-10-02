@@ -97,6 +97,38 @@ class Profile(object):
 
         return result
 
+    def get_substitutions(self, w):
+        l = len(w)
+        if l < 4:
+            return []
+
+        result = []
+
+        for i in range(l):
+
+            c = w[i]
+
+            if i == 0:
+                stat_variants = self.first.get_variants(w[1], w[2], skip=c)
+            elif i == 1:
+                stat_variants = self.second.get_variants(w[0], w[2], skip=c)
+            elif i == l - 1:
+                stat_variants = self.last.get_variants(w[l-3], w[l-2], skip=c)
+            elif i == l - 2:
+                stat_variants = self.pre_last.get_variants(w[l-3], w[l-1], skip=c)
+            else:
+                stat_variants = self.middle.get_variants(w[i - 1], w[i + 1], skip=c)
+
+            position_result = []
+
+            for variant in stat_variants:
+                position_result.append((w[:i] + variant[0] + w[i+1:], variant[1]))
+
+            if position_result:
+                result.append(position_result)
+
+        return result
+
 
 def get_sentences():
     with open(LIST_907_PATH, encoding='utf-8') as f:
@@ -135,6 +167,6 @@ def get_profile() -> Profile:
 # =================================
 p = get_profile()
 
-a = p.get_additions('song')
+a = p.get_substitutions('test')
 
 print(a)
